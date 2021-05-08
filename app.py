@@ -28,7 +28,7 @@ def predict():
         df_final=pd.read_csv("processed_txts.csv")
         if user_name not in df_final["reviews_username"].tolist():
             return render_template('index.html', prediction_text='user name not exists')
-        #print(df_final.head(1))
+        print(df_final.head(1))
         top5_df=s.user_recomend(df_final,user_name)
         print(top5_df)
         top5_df=top5_df[["name","brand","manufacturer"]]
