@@ -1,16 +1,16 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 stop_words = stopwords.words('english')
-import warnings
-warnings.filterwarnings('ignore')
+#import warnings
+#warnings.filterwarnings('ignore')
 import nltk
 nltk.download('wordnet')
-from nltk.stem import PorterStemmer
-from textblob import Word
+#from nltk.stem import PorterStemmer
+#from textblob import Word
 from sklearn.model_selection import train_test_split
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.feature_extraction.text import TfidfVectorizer
