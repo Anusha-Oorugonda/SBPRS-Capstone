@@ -2,13 +2,13 @@ import pandas as pd
 import numpy as np
 #import matplotlib.pyplot as plt
 import nltk
-nltk.download('stopwords')
+#nltk.download('stopwords')
 from nltk.corpus import stopwords
-stop_words = stopwords.words('english')
-#import warnings
-#warnings.filterwarnings('ignore')
-import nltk
-nltk.download('wordnet')
+#stop_words = stopwords.words('english')
+import warnings
+warnings.filterwarnings('ignore')
+#import nltk
+#nltk.download('wordnet')
 #from nltk.stem import PorterStemmer
 #from textblob import Word
 from sklearn.model_selection import train_test_split
