@@ -60,6 +60,7 @@ class SentimentAnalysis():
         tfidf_vect=joblib.load("tfidf_vect.pkl")
         #reviews_df=load_preprocess(df)
         reviews_df=df.groupby(['reviews_username','name'])['reviews_rating'].mean().reset_index()
+        print("dataframe")
         train, test = train_test_split(reviews_df, test_size=0.30, random_state=43)
         # Pivot the train ratings' dataset into matrix format in which columns are movies and the rows are user IDs.
         user_pivot = train.pivot(index='reviews_username',columns='name',values='reviews_rating').fillna(0)
