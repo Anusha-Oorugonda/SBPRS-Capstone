@@ -60,7 +60,7 @@ class SentimentAnalysis():
         tfidf_vect=joblib.load("tfidf_vect.pkl")
         #reviews_df=load_preprocess(df)
         reviews_df=df.groupby(['reviews_username','name'])['reviews_rating'].mean().reset_index()
-        print("dataframe")
+        print(reviews_df.head(1))
         train, test = train_test_split(reviews_df, test_size=0.30, random_state=43)
         # Pivot the train ratings' dataset into matrix format in which columns are movies and the rows are user IDs.
         user_pivot = train.pivot(index='reviews_username',columns='name',values='reviews_rating').fillna(0)
@@ -77,6 +77,7 @@ class SentimentAnalysis():
         user_predicted_ratings = np.dot(user_correlation, user_pivot.fillna(0))
         user_final_rating = np.multiply(user_predicted_ratings,dummy_train)
         final_recomended_prods=user_final_rating.loc[user_name].sort_values(ascending=False)[0:20]
+        print(final_recomended_prods.head(2))
         top20_prod={}
         top20_prod['name']=[]
         top20_prod["brand"]=[]
