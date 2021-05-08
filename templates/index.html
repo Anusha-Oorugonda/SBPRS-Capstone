@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html >
+<body align="center" style="background-color:Cyan;">
+<head>
+  <meta charset="UTF-8">
+  <title>Model Deployment</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+    <style>
+      body {
+        font-family: 'Tangerine', serif;
+        font-size: 28px;
+      }
+    </style>
+
+
+</head>
+
+<body>
+ <div class="login">
+	<h1 style="text-align:center">Product Sentiment Analysis</h1>
+
+    <form align="center" action="{{ url_for('predict')}}" method="post">
+    	<input type="text" style="text-align:center" name="reviews_username" placeholder="reviews_username" required="required" />
+        <br>
+
+
+        <button align="center" type="submit" class="btn btn-primary btn-block btn-large">Login</button>
+    </form>
+
+   <br>
+   <br>
+     <style>
+      body {
+        font-family: 'Tangerine', serif;
+        font-size: 20px;
+      }
+    </style>
+     {{ prediction_text }}
+     <p>Products You May Like</p>
+        <table>
+            <tr>
+                {% for col in columns %}
+                <th>{{col}}</th>
+                {% endfor %}
+            </tr>
+            {% for row in rows %}
+            <tr>
+                {% for col, row_ in zip(columns, row) %}
+                <td>{{row_}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+ </div>
+
+
+</body>
+</body>
+</html>
