@@ -21,23 +21,24 @@ from collections import Counter
 class SentimentAnalysis():
     def __init__(self):
         print("initialised")
-    #def load_preprocess(self):
-        #reviews_df=pd.read_csv('sample30.csv',encoding='latin-1')
-        #reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join(x.lower() for x in x.split()))
-        #reviews_df['reviews_text'] = reviews_df['reviews_text'].str.replace('[^\w\s]','')
-        #reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join(x for x in x.split() if x not in stop_words))
-        #freq_ten = pd.Series(' '.join(reviews_df['reviews_text']).split()).value_counts()[:10]
-        #freq_ten = list(freq_ten.index)
-        #reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join(x for x in x.split() if x not in freq_ten))
-        #freq_rare = pd.Series(' '.join(reviews_df['reviews_text']).split()).value_counts()[-10:]
-        #freq_rare = list(freq_rare.index)
-        #reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join(x for x in x.split() if x not in freq_rare))
-        #st = PorterStemmer()
-        #reviews_df['reviews_text'].apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
-        #reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join([Word(word).lemmatize() for word in x.split()]))
-        #reviews_df['user_sentiment']=reviews_df['user_sentiment'].map({"Positive":1,"Negative":0})
-        #reviews_df = reviews_df.dropna(subset=['user_sentiment'])
-        #print(reviews_df.head(1))
+    def load_preprocess(self):
+        reviews_df=pd.read_csv('sample30.csv',encoding='latin-1')
+        reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join(x.lower() for x in x.split()))
+        reviews_df['reviews_text'] = reviews_df['reviews_text'].str.replace('[^\w\s]','')
+        reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join(x for x in x.split() if x not in stop_words))
+        freq_ten = pd.Series(' '.join(reviews_df['reviews_text']).split()).value_counts()[:10]
+        freq_ten = list(freq_ten.index)
+        reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join(x for x in x.split() if x not in freq_ten))
+        freq_rare = pd.Series(' '.join(reviews_df['reviews_text']).split()).value_counts()[-10:]
+        freq_rare = list(freq_rare.index)
+        reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join(x for x in x.split() if x not in freq_rare))
+        st = PorterStemmer()
+        reviews_df['reviews_text'].apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
+        reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join([Word(word).lemmatize() for word in x.split()]))
+        reviews_df['user_sentiment']=reviews_df['user_sentiment'].map({"Positive":1,"Negative":0})
+        reviews_df = reviews_df.dropna(subset=['user_sentiment'])
+        print(reviews_df.head(1))
+        reviews_df.to_csv("processed_txts.csv")
         #return reviews_df
     def lr_model(self,df):
         X = df['reviews_text']
@@ -54,12 +55,40 @@ class SentimentAnalysis():
         LRModel.fit(train_tfidf, y_train)
         joblib.dump(LRModel, 'LRModel.pkl')
         joblib.dump(tfidf_vect,"tfidf_vect.pkl")
-        #return tfidf_vect   
+        #return tfidf_vect
+    def user_recommendation_to_csv(self,df):
+        #model_load = joblib.load("LRModel.pkl")
+        #tfidf_vect=joblib.load("tfidf_vect.pkl")
+        #reviews_df=load_preprocess(df)
+        reviews_df=df.groupby(['reviews_username','name'])['reviews_rating'].mean().reset_index()
+        #print(reviews_df.head(1))
+        #train, test = train_test_split(reviews_df, test_size=0.30, random_state=43)
+        #print(train.shape)
+        #print(test.shape)
+        train=reviews_df.copy()
+        # Pivot the train ratings' dataset into matrix format in which columns are movies and the rows are user IDs.
+        user_pivot = train.pivot(index='reviews_username',columns='name',values='reviews_rating').fillna(0)
+        dummy_train = train.copy()
+        dummy_train['reviews_rating'] = dummy_train['reviews_rating'].apply(lambda x: 0 if x>=1 else 1)
+        dummy_train = dummy_train.pivot(index='reviews_username',columns='name',values='reviews_rating').fillna(1)
+        # Create a user-movie matrix.
+        user_pivot = train.pivot(index='reviews_username',columns='name',values='reviews_rating')
+        mean = np.nanmean(user_pivot, axis=1)
+        df_subtracted = (user_pivot.T-mean).T
+        user_correlation = 1 - pairwise_distances(df_subtracted.fillna(0), metric='cosine')
+        user_correlation[np.isnan(user_correlation)] = 0
+        user_correlation[user_correlation<0]=0
+        user_predicted_ratings = np.dot(user_correlation, user_pivot.fillna(0))
+        user_final_rating = np.multiply(user_predicted_ratings,dummy_train)
+        #final_recomended_prods=user_final_rating.loc[user_name].sort_values(ascending=False)[0:20]
+        #print(final_recomended_prods.head(2))
+        user_final_rating.to_csv("userpredictions.csv")
     def user_recomend(self,df,user_name):
         model_load = joblib.load("LRModel.pkl")
         tfidf_vect=joblib.load("tfidf_vect.pkl")
         user_final_rating=pd.read_csv("userpredictions.csv")
         user_final_rating.set_index('reviews_username', inplace=True)
+        print(user_final_rating.head(2))
         #print(user_final_rating.head(2))
         #user_name=str(user_name)
         #print(user_name)

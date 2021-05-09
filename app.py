@@ -26,6 +26,7 @@ def predict():
         user_name=request.form["reviews_username"]
         print(user_name)
         df_final=pd.read_csv("processed_txts.csv")
+        #s.user_recommendation_to_csv(df_final)
         if user_name not in df_final["reviews_username"].tolist():
             return render_template('index.html', prediction_text='user name not exists')
         #print(df_final.head(1))
