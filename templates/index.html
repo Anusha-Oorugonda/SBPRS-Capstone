@@ -77,11 +77,11 @@ body {
     </style>
 
      {{ prediction_text }}
-     <div class="column">
-        <div class="column" style="background-color:powderblue;">
+     <div >
+        <div  style="background-color:powderblue;">
             <p>Products You May Like</p>
             {% for row in rows %}
-            <div class="result-text">
+            <div>
             {% for col, row_ in zip(columns, row)%}
                 <p style="font-weight:bold;">{{col}}: <span style="font-weight:normal;">{{row_}} </span></p>
             {% endfor %}
