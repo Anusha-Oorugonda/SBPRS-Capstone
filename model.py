@@ -58,27 +58,11 @@ class SentimentAnalysis():
     def user_recomend(self,df,user_name):
         model_load = joblib.load("LRModel.pkl")
         tfidf_vect=joblib.load("tfidf_vect.pkl")
-        #reviews_df=load_preprocess(df)
-        reviews_df=df.groupby(['reviews_username','name'])['reviews_rating'].mean().reset_index()
-        print(reviews_df.head(1))
-        train, test = train_test_split(reviews_df, test_size=0.30, random_state=43)
-        print(train.shape)
-        print(test.shape)
-        # Pivot the train ratings' dataset into matrix format in which columns are movies and the rows are user IDs.
-        user_pivot = train.pivot(index='reviews_username',columns='name',values='reviews_rating').fillna(0)
-        dummy_train = train.copy()
-        dummy_train['reviews_rating'] = dummy_train['reviews_rating'].apply(lambda x: 0 if x>=1 else 1)
-        dummy_train = dummy_train.pivot(index='reviews_username',columns='name',values='reviews_rating').fillna(1)
-        # Create a user-movie matrix.
-        user_pivot = train.pivot(index='reviews_username',columns='name',values='reviews_rating')
-        mean = np.nanmean(user_pivot, axis=1)
-        df_subtracted = (user_pivot.T-mean).T
-        user_correlation = 1 - pairwise_distances(df_subtracted.fillna(0), metric='cosine')
-        user_correlation[np.isnan(user_correlation)] = 0
-        user_correlation[user_correlation<0]=0
-        prin("user correlation")
-        user_predicted_ratings = np.dot(user_correlation, user_pivot.fillna(0))
-        user_final_rating = np.multiply(user_predicted_ratings,dummy_train)
+        user_final_rating=pd.read_csv("userpredictions.csv")
+        user_final_rating.set_index('reviews_username', inplace=True)
+        #print(user_final_rating.head(2))
+        #user_name=str(user_name)
+        #print(user_name)
         final_recomended_prods=user_final_rating.loc[user_name].sort_values(ascending=False)[0:20]
         print(final_recomended_prods.head(2))
         top20_prod={}
