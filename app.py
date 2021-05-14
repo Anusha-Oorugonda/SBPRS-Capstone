@@ -1,7 +1,7 @@
 from flask import Flask, jsonify,  request, render_template
 import joblib
 import numpy as np
-from model import SentimentAnalysis
+from model import RecommendationSystem
 import pandas as pd
 import numpy as np
 from collections import Counter
@@ -9,7 +9,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 import pickle
 
-s=SentimentAnalysis()
+s=RecommendationSystem()
 app = Flask(__name__)
 
 print("in app")

@@ -18,7 +18,7 @@ from sklearn.linear_model import LogisticRegression
 import joblib
 from collections import Counter
 
-class SentimentAnalysis():
+class RecommendationSystem():
     def __init__(self):
         print("initialised")
     def load_preprocess(self):
