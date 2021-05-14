@@ -7,10 +7,10 @@ from nltk.corpus import stopwords
 stop_words = stopwords.words('english')
 import warnings
 warnings.filterwarnings('ignore')
-#import nltk
+import nltk
 nltk.download('wordnet')
-#from nltk.stem import PorterStemmer
-#from textblob import Word
+from nltk.stem import PorterStemmer
+from textblob import Word
 from sklearn.model_selection import train_test_split
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -22,6 +22,7 @@ class SentimentAnalysis():
     def __init__(self):
         print("initialised")
     def load_preprocess(self):
+        #this process will load the dataset and saves the entire preprocessed data into csv file
         reviews_df=pd.read_csv('sample30.csv',encoding='latin-1')
         reviews_df['reviews_text'] = reviews_df['reviews_text'].apply(lambda x: " ".join(x.lower() for x in x.split()))
         reviews_df['reviews_text'] = reviews_df['reviews_text'].str.replace('[^\w\s]','')
@@ -41,6 +42,7 @@ class SentimentAnalysis():
         reviews_df.to_csv("processed_txts.csv")
         #return reviews_df
     def lr_model(self,df):
+        # This model dumps the Logistic Regression models and tfidf vectors to pickle file
         X = df['reviews_text']
         y = df['user_sentiment']
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=43)
@@ -54,9 +56,9 @@ class SentimentAnalysis():
         LRModel=LogisticRegression(C=10,class_weight={0:0.6,1:0.4},penalty='l2',random_state=43)
         LRModel.fit(train_tfidf, y_train)
         joblib.dump(LRModel, 'LRModel.pkl')
-        joblib.dump(tfidf_vect,"tfidf_vect.pkl")
-        #return tfidf_vect
+        joblib.dump(tfidf_vect,"tfidf_vect.pkl")    
     def user_recommendation_to_csv(self,df):
+        # this model saves the user final predicted ratings to csv file for entire dataset
         #model_load = joblib.load("LRModel.pkl")
         #tfidf_vect=joblib.load("tfidf_vect.pkl")
         #reviews_df=load_preprocess(df)
@@ -84,6 +86,7 @@ class SentimentAnalysis():
         #print(final_recomended_prods.head(2))
         user_final_rating.to_csv("userpredictions.csv")
     def user_recomend(self,df,user_name):
+        # this method returns top five products to user
         model_load = joblib.load("LRModel.pkl")
         tfidf_vect=joblib.load("tfidf_vect.pkl")
         user_final_rating=pd.read_csv("userpredictions.csv")
